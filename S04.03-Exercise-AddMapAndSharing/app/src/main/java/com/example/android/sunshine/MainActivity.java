@@ -37,10 +37,14 @@ import com.example.android.sunshine.utilities.NetworkUtils;
 import com.example.android.sunshine.utilities.OpenWeatherJsonUtils;
 
 import java.net.URL;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class MainActivity extends AppCompatActivity implements ForecastAdapterOnClickHandler {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    private static int counter = 0;
 
     private RecyclerView mRecyclerView;
     private ForecastAdapter mForecastAdapter;
@@ -156,6 +160,10 @@ public class MainActivity extends AppCompatActivity implements ForecastAdapterOn
     }
 
     public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
+
+        public FetchWeatherTask() {
+            Log.i(TAG, "AsyncTask counter: " + (++ counter));
+        }
 
         @Override
         protected void onPreExecute() {
