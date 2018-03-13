@@ -293,7 +293,7 @@ public class WeatherProvider extends ContentProvider {
         return cursor;
     }
 
-//  TODO (1) Implement the delete method of the ContentProvider
+//  DONE (1) Implement the delete method of the ContentProvider
     /**
      * Deletes data at a given URI with optional arguments for more fine tuned deletions.
      *
@@ -304,11 +304,38 @@ public class WeatherProvider extends ContentProvider {
      */
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        throw new RuntimeException("Student, you need to implement the delete method!");
+        int match = sUriMatcher.match(uri);
 
-//          TODO (2) Only implement the functionality, given the proper URI, to delete ALL rows in the weather table
+        int deletedCount = 0;
+        SQLiteDatabase sqLiteDatabase = mOpenHelper.getWritableDatabase();
+        switch(match) {
+            case CODE_WEATHER:
+                /*
+                * NOTE (from solution):
+                * If we pass null as the selection to SQLiteDatabase#delete, our entire table will be
+                * deleted. However, if we do pass null and delete all of the rows in the table, we won't
+                * know how many rows were deleted. According to the documentation for SQLiteDatabase,
+                * passing "1" for the selection will delete all rows and return the number of rows
+                * deleted, which is what the caller of this method expects.
+                */
+                if (selection == null) {
+                    selection = "1";
+                }
 
-//      TODO (3) Return the number of rows deleted
+                deletedCount = sqLiteDatabase.delete(
+                        WeatherContract.WeatherEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+//          DONE (2) Only implement the functionality, given the proper URI, to delete ALL rows in the weather table
+        if (deletedCount > 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+
+//      DONE (3) Return the number of rows deleted
+        return deletedCount;
     }
 
     /**

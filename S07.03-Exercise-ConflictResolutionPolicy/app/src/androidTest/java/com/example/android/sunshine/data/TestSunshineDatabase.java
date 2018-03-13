@@ -235,7 +235,7 @@ public class TestSunshineDatabase {
         long originalWeatherId = testWeatherValues.getAsLong(REFLECTED_COLUMN_WEATHER_ID);
 
         /* Insert the ContentValues with old weather ID into database */
-        database.insert(
+        long firstInsert = database.insert(
                 WeatherContract.WeatherEntry.TABLE_NAME,
                 null,
                 testWeatherValues);
@@ -249,10 +249,13 @@ public class TestSunshineDatabase {
         testWeatherValues.put(REFLECTED_COLUMN_WEATHER_ID, newWeatherId);
 
         /* Insert the ContentValues with new weather ID into database */
-        database.insert(
+        long secondInsert = database.insert(
                 WeatherContract.WeatherEntry.TABLE_NAME,
                 null,
                 testWeatherValues);
+
+        assertTrue("Second insert should replace the first insert.",
+                secondInsert != -1);
 
         /* Query for a weather record with our new weather ID */
         Cursor newWeatherIdCursor = database.query(
@@ -274,7 +277,6 @@ public class TestSunshineDatabase {
     }
 
     /**
->>>>>>> a6840f1... S07.03-Exercise-ConflictResolutionPolicy
      * Tests the columns with null values cannot be inserted into the database.
      */
     @Test
@@ -336,7 +338,6 @@ public class TestSunshineDatabase {
     /**
      * Tests to ensure that inserts into your database results in automatically
      * incrementing row IDs.
->>>>>>> 4174cf2... S07.02-Exercise-PreventInvalidInserts
      */
     @Test
     public void testIntegerAutoincrement() {
