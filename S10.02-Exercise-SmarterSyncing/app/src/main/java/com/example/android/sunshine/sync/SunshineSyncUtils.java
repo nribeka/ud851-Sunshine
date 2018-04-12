@@ -15,20 +15,62 @@
  */
 package com.example.android.sunshine.sync;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+
+import com.example.android.sunshine.data.WeatherContract;
 
 
 public class SunshineSyncUtils {
 
-//  TODO (1) Declare a private static boolean field called sInitialized
+//  DONE (1) Declare a private static boolean field called sInitialized
+    private static boolean sInitialized;
 
-    //  TODO (2) Create a synchronized public static void method called initialize
-    //  TODO (3) Only execute this method body if sInitialized is false
-    //  TODO (4) If the method body is executed, set sInitialized to true
-    //  TODO (5) Check to see if our weather ContentProvider is empty
-        //  TODO (6) If it is empty or we have a null Cursor, sync the weather now!
+    synchronized public static void initialize(@NonNull final Context context) {
+        if (sInitialized) {
+            return;
+        }
+
+        sInitialized = true;
+
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                Uri weatherUri = WeatherContract.WeatherEntry.CONTENT_URI;
+
+                String selectionStatement = WeatherContract.WeatherEntry
+                        .getSqlSelectForTodayOnwards();
+
+                ContentResolver weatherContentResolver = context.getContentResolver();
+                Cursor cursor = weatherContentResolver.query(
+                        weatherUri,
+                        new String[]{WeatherContract.WeatherEntry._ID},
+                        selectionStatement,
+                        null,
+                        null);
+
+                if (cursor == null || cursor.getCount() == 0) {
+                    startImmediateSync(context);
+                } else {
+                    // TODO: Shouldn't there be a check to null first before closing this?
+                    cursor.close();
+                }
+
+                return null;
+            }
+        }.execute();
+    }
+
+    //  DONE (2) Create a synchronized public static void method called initialize
+    //  DONE (3) Only execute this method body if sInitialized is false
+    //  DONE (4) If the method body is executed, set sInitialized to true
+    //  DONE (5) Check to see if our weather ContentProvider is empty
+        //  DONE (6) If it is empty or we have a null Cursor, sync the weather now!
 
     /**
      * Helper method to perform a sync immediately using an IntentService for asynchronous

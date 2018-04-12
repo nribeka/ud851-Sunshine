@@ -212,4 +212,17 @@ public final class SunshinePreferences {
         editor.putLong(lastNotificationKey, timeOfNotification);
         editor.apply();
     }
+
+    public static boolean isNotificationEnabled(Context context) {
+        String notificationEnabledKey = context
+                .getResources()
+                .getString(R.string.pref_enable_notifications_key);
+
+        boolean notificationDefaultValue = context
+                .getResources()
+                .getBoolean(R.bool.show_notifications_default_value);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences.getBoolean(notificationEnabledKey, notificationDefaultValue);
+    }
 }
